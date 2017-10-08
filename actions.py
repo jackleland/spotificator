@@ -1,0 +1,5 @@
+ADD_TRACKS = 'add_tracks'
+GET_TRACK = 'get_track'
+READ_ST = 'read_saved_tracks'
+SEARCH_ARTIST = 'search_artist'
+SEARCH_ALBUM = 'search_album'
