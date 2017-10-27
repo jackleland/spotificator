@@ -15,6 +15,7 @@ class Spotificator(object):
     SPOTIFY_TRACK_LINK = SPOTIFY_URL + "track/"
     SPOTIFY_ALBUM_LINK = SPOTIFY_URL + "album/"
     TEST_CHANNEL_ID = 'G6Z023N1Y'
+    LIVE_CHANNEL_ID = 'C6NB64MV5'
     BOT_COMMANDS = ["scan"]
     READ_WEBSOCKET_DELAY = 1
     POLL_INTERVAL = 300.0
@@ -139,7 +140,7 @@ class Spotificator(object):
                     title=pl_track['track']['name'],
                     artist=pl_track['track']['artists'][0]['name'])
         if message != '':
-            self.slack_client.api_call("chat.postMessage", channel=self.TEST_CHANNEL_ID, text=message, as_user=True)
+            self.slack_client.api_call("chat.postMessage", channel=self.LIVE_CHANNEL_ID, text=message, as_user=True)
         self.playlist_tracks = new_pl_tracks
 
     def _get_playlist_set(self):
@@ -157,20 +158,21 @@ class Spotificator(object):
         Intended for use if bot is down temporarily or not always up.
         """
         print(channel)
-        api_call = self.slack_client.api_call('channels.history', count=1000, channel=channel)
-        if api_call.get('ok'):
-            print('API CALL OK')
-            # Retrieve all users so we can find our bot
-            channel_history = api_call.get('messages')
-            n = 0
-            for message in channel_history:
-                if self.SPOTIFY_TRACK_LINK in message['text']:
-                    print(message['text'])
-                    n += 1
-            return {'found': len(channel_history), 'added': n}
-        else:
-            print("API CALL FAILED")
-            return {'reason': api_call.get('error')}
+        # api_call = self.slack_client.api_call('channels.history', count=1000, channel=channel)
+        # if api_call.get('ok'):
+        #     print('API CALL OK')
+        #     # Retrieve all users so we can find our bot
+        #     channel_history = api_call.get('messages')
+        #     n = 0
+        #     for message in channel_history:
+        #         if self.SPOTIFY_TRACK_LINK in message['text']:
+        #             print(message['text'])
+        #             n += 1
+        #     return {'found': len(channel_history), 'added': n}
+        # else:
+        #     print("API CALL FAILED")
+        #     return {'reason': api_call.get('error')}
+        return {'reason': 'Jack\'s not implemented this yet'}
 
 
 if __name__ == '__main__':
