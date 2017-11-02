@@ -18,7 +18,7 @@ class Spotificator(object):
     LIVE_CHANNEL_ID = 'C6NB64MV5'
     BOT_COMMANDS = ["scan"]
     READ_WEBSOCKET_DELAY = 1
-    POLL_INTERVAL = 300.0
+    POLL_INTERVAL = 1800.0
 
     def __init__(self, scope='playlist-modify-private'):
         self.slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
@@ -34,10 +34,10 @@ class Spotificator(object):
                 t_current = time.time()
                 t_elapsed = t_current - t_begin
                 if (t_elapsed % self.POLL_INTERVAL) <= 5*self.READ_WEBSOCKET_DELAY and not polled:
-                    print('Refreshing spotify token')
+                    print('{} - Refreshing spotify token'.format(time.asctime()))
                     self.spotifpier.refresh_token()
                     polled = True
-                elif polled and (t_elapsed % self.POLL_INTERVAL > (self.POLL_INTERVAL - 20*self.READ_WEBSOCKET_DELAY)):
+                elif polled and (t_elapsed % self.POLL_INTERVAL > (self.POLL_INTERVAL - (20*self.READ_WEBSOCKET_DELAY))):
                     polled = False
                 self.check_playlist()
                 command, channel, command_type = self.parse_slack_output(self.slack_client.rtm_read())

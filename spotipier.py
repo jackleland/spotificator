@@ -1,7 +1,9 @@
-from spotipy import Spotify
+from spotipy import Spotify, SpotifyException
 import spotipy.util as util
+from spotipy.oauth2 import SpotifyOAuth
 from actions import *
 import os
+import webbrowser
 
 PLAYLIST_NAME = os.environ.get('SPOTIFY_PLAYLIST_NAME')
 PLAYLIST_ID = os.environ.get('SPOTIFY_PLAYLIST_ID')
@@ -16,18 +18,21 @@ class Spotipier(object):
         }
         self.username = username
         self.scope = scope
-        self.token = None
-        self.client = None
-        self.user_id = None
-        self.refresh_token()
-
-    def refresh_token(self):
         self.token = util.prompt_for_user_token(self.username, self.scope)
         if self.token:
+            client_id = os.getenv('SPOTIPY_CLIENT_ID')
+            client_secret = os.getenv('SPOTIPY_CLIENT_SECRET')
+            redirect_uri = os.getenv('SPOTIPY_REDIRECT_URI')
+            self.oauth = SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri,
+                                 scope=self.scope, cache_path=".cache-" + self.username)
             self.client = Spotify(auth=self.token)
             self.user_id = self.client.me()['id']
         else:
             raise Exception('Authorisation failed. PANIC!')
+
+    def refresh_token(self):
+        if self.oauth and self.token:
+            self.token = self.oauth.refresh_access_token(self.token)
 
     def get_playlist_tracks(self):
         tracks = self.client.user_playlist_tracks(self.username, PLAYLIST_ID)
@@ -44,3 +49,4 @@ class Spotipier(object):
 
     def get_user(self, user_id):
         return self.client.user(user_id)
+
