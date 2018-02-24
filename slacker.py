@@ -4,7 +4,7 @@ import os
 import time
 
 
-class Spotificator(object):
+class Slacker(object):
 
     BOT_NAME = 'spotificator'
     BOT_ID = os.environ.get('SLACK_BOT_ID')
@@ -22,8 +22,8 @@ class Spotificator(object):
 
     def __init__(self, scope='playlist-modify-private'):
         self.slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
-        self.spotifpier = Spotipier(scope=scope)
-        self.playlist_tracks = self.spotifpier.get_playlist_tracks()
+        self.spotipier = Spotipier(scope=scope)
+        self.playlist_tracks = self.spotipier.get_playlist_tracks()
 
     def main_loop(self):
         if self.slack_client.rtm_connect():
@@ -35,7 +35,7 @@ class Spotificator(object):
                 t_elapsed = t_current - t_begin
                 if (t_elapsed % self.POLL_INTERVAL) <= 5*self.READ_WEBSOCKET_DELAY and not polled:
                     print('{} - Refreshing spotify token'.format(time.asctime()))
-                    self.spotifpier.refresh_token()
+                    self.spotipier.refresh_token()
                     polled = True
                 elif polled and (t_elapsed % self.POLL_INTERVAL > (self.POLL_INTERVAL - (20*self.READ_WEBSOCKET_DELAY))):
                     polled = False
@@ -61,12 +61,12 @@ class Spotificator(object):
             return None
 
     def get_playlist_id(self):
-        playlists = self.spotifpier.get_user_playlists()
+        playlists = self.spotipier.get_user_playlists()
         while playlists:
             for i, playlist in enumerate(playlists['items']):
                 print("%4d %s %s" % (i + 1 + playlists['offset'], playlist['uri'], playlist['name']))
             if playlists['next']:
-                playlists = self.spotifpier.client.next(playlists)
+                playlists = self.spotipier.client.next(playlists)
             else:
                 playlists = None
 
@@ -92,8 +92,8 @@ class Spotificator(object):
                 response = "Channel scan failed: " + context['reason']
         elif command_type == self.SPOTIFY_TRACK_LINK:
             print(command)
-            track = self.spotifpier.get_track(command)
-            self.spotifpier.add_tracks_to_playlist([command])
+            track = self.spotipier.get_track(command)
+            self.spotipier.add_tracks_to_playlist([command])
             response = "Added {title} by {artist} to Moosic".format(title=track['name'], artist=track['artists'][0]['name'])
         self.slack_client.api_call("chat.postMessage", channel=channel,
                                    text=response, as_user=True)
@@ -126,15 +126,15 @@ class Spotificator(object):
         return None, None, None
 
     def check_playlist(self):
-        new_pl_tracks = self.spotifpier.get_playlist_tracks()
+        new_pl_tracks = self.spotipier.get_playlist_tracks()
         message = ''
-        # print('Checking playlist for manually added tracks.')
+        print('Checking playlist for manually added tracks.')
         old_track_ids = self._get_playlist_set()
         for pl_track in new_pl_tracks['items']:
             new_track_id = pl_track['track']['id']
             if new_track_id not in old_track_ids:
                 print('...Found new track')
-                user = self.spotifpier.get_user(pl_track['added_by']['id'])
+                user = self.spotipier.get_user(pl_track['added_by']['id'])
                 message += "NEW TRACK: {user} added {title} by {artist} to Moosic \n".format(
                     user=user['display_name'],
                     title=pl_track['track']['name'],
@@ -176,7 +176,7 @@ class Spotificator(object):
 
 
 if __name__ == '__main__':
-    spotify_client = Spotificator()
+    spotify_client = Slacker()
     spotify_client.main_loop()
     # spotify_client.get_playlist_id()
 
