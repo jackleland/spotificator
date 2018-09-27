@@ -24,7 +24,8 @@ class Spotipier(object):
             client_secret = os.getenv('SPOTIPY_CLIENT_SECRET')
             redirect_uri = os.getenv('SPOTIPY_REDIRECT_URI')
             self.oauth = SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri,
-                                 scope=self.scope, cache_path=".cache-" + self.username)
+                                      scope=self.scope, cache_path=".cache-" + self.username)
+            self.token = self.oauth.get_cached_token()
             self.client = Spotify(auth=self.token)
             self.user_id = self.client.me()['id']
         else:
